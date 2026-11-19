@@ -520,3 +520,22 @@ button:disabled {
     flex-wrap: wrap;
   }
 }
+
+/* Inspector tables: values stay on one line; long values ellipsize instead of
+   wrapping into unreadable columns. */
+#inspector-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+#inspector-content th,
+#inspector-content td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 12rem;
+  padding: 0.2rem 0.35rem;
+  border-bottom: 1px solid var(--color-border, #e3e6ec);
+  text-align: left;
+}
+#inspector-content td:hover { white-space: normal; }
