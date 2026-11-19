@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Run tests on source change",
+      "trigger": "PostFileSave",
+      "description": "Runs node --test tests/ whenever a file under src/ or tests/ is saved",
+      "matcher": "src/|tests/",
+      "action": {
+        "type": "command",
+        "command": "cd /workspace/work/kiroween/hwp-reader && node --test tests/",
+        "timeout": 60
+      }
+    }
+  ]
+}

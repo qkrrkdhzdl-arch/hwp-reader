@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Remind to update tasks.md checkboxes",
+      "trigger": "PostFileSave",
+      "matcher": "src/",
+      "action": {
+        "type": "agent",
+        "prompt": "A file under src/ was just saved. Check whether the work done corresponds to a task in .kiro/specs/hwp-reader/tasks.md that is now complete. If so, remind the user to tick the checkbox for that task (or tick it yourself if you are making the edit) before committing. One checkbox per completed task — do not tick tasks that are only partially done."
+      }
+    }
+  ]
+}

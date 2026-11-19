@@ -1,0 +1,85 @@
+{
+  "version": {
+    "major": 5,
+    "minor": 0,
+    "build": 0,
+    "revision": 0
+  },
+  "flags": {
+    "compressed": false,
+    "encrypted": false,
+    "distribution": false,
+    "script": false,
+    "drm": false,
+    "hasMemo": false,
+    "raw": 0
+  },
+  "previewText": "가나다 ABC",
+  "docInfo": {
+    "idMappings": null
+  },
+  "sections": [
+    {
+      "index": 0,
+      "paragraphs": [
+        {
+          "index": 0,
+          "text": "가나다",
+          "hasTable": false,
+          "hasInlineObject": false,
+          "inlineControls": []
+        },
+        {
+          "index": 1,
+          "text": "ABC",
+          "hasTable": false,
+          "hasInlineObject": false,
+          "inlineControls": []
+        },
+        {
+          "index": 2,
+          "text": "",
+          "hasTable": true,
+          "hasInlineObject": false,
+          "inlineControls": [],
+          "table": {
+            "rowCount": 1,
+            "colCount": 2,
+            "cells": [
+              {
+                "row": 0,
+                "col": 0,
+                "rowSpan": 1,
+                "colSpan": 1,
+                "paragraphs": [
+                  {
+                    "index": 3,
+                    "text": "표1",
+                    "hasTable": false,
+                    "hasInlineObject": false,
+                    "inlineControls": []
+                  }
+                ]
+              },
+              {
+                "row": 0,
+                "col": 1,
+                "rowSpan": 1,
+                "colSpan": 1,
+                "paragraphs": [
+                  {
+                    "index": 4,
+                    "text": "표2",
+                    "hasTable": false,
+                    "hasInlineObject": false,
+                    "inlineControls": []
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

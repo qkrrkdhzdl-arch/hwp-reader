@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HWP 뷰어</title>
+  <link rel="stylesheet" href="styles/app.css" />
+</head>
+<body>
+  <!-- Error banner — shown when parsing fails -->
+  <div id="error-banner" role="alert" aria-live="assertive" hidden>
+    <span id="error-code" class="error-code"></span>
+    <span id="error-message" class="error-message"></span>
+    <details id="error-stack-details" hidden>
+      <summary>오류 세부 정보 / Error details</summary>
+      <pre id="error-stack"></pre>
+    </details>
+    <button id="error-close" aria-label="오류 닫기 / Close error">✕</button>
+  </div>
+
+  <!-- Large-file confirmation dialog -->
+  <dialog id="large-file-dialog" aria-labelledby="large-file-title">
+    <h2 id="large-file-title">큰 파일 / Large file</h2>
+    <p>
+      이 파일은 50 MB보다 큽니다. 처리하는 동안 브라우저가 느려질 수 있습니다.<br />
+      <span lang="en">This file is larger than 50 MB. The browser may slow down while processing it.</span>
+    </p>
+    <div class="dialog-actions">
+      <button id="large-file-proceed">계속 / Proceed</button>
+      <button id="large-file-cancel">취소 / Cancel</button>
+    </div>
+  </dialog>
+
+  <header class="app-header">
+    <h1 class="app-title">HWP 뷰어 <span lang="en">/ HWP Viewer</span></h1>
+    <div class="toolbar" id="toolbar">
+      <button id="btn-export-json" disabled aria-label="JSON 내보내기 / Export JSON">
+        JSON 내보내기 <span lang="en">/ Export JSON</span>
+      </button>
+      <button id="btn-export-html" disabled aria-label="HTML 내보내기 / Export HTML">
+        HTML 내보내기 <span lang="en">/ Export HTML</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <!-- Drop zone / file picker -->
+    <div
+      id="drop-zone"
+      class="drop-zone"
+      role="button"
+      tabindex="0"
+      aria-label="HWP 파일을 여기에 끌어다 놓거나 클릭하여 선택하세요 / Drop an HWP file here or click to select"
+    >
+      <div class="drop-zone-icon" aria-hidden="true">📄</div>
+      <p class="drop-zone-primary">HWP 파일을 여기에 끌어다 놓으세요</p>
+      <p class="drop-zone-secondary" lang="en">Drop an .hwp file here, or click to select</p>
+      <label class="drop-zone-label" for="file-input">
+        파일 선택 / Choose file
+        <input
+          id="file-input"
+          type="file"
+          accept=".hwp,.hwpx"
+          aria-label="HWP 파일 선택 / Select HWP file"
+        />
+      </label>
+    </div>
+
+    <!-- Loading spinner — shown during parsing -->
+    <div id="spinner" class="spinner" hidden aria-live="polite" aria-label="불러오는 중 / Loading…">
+      <div class="spinner-ring" aria-hidden="true"></div>
+      <span>불러오는 중… <span lang="en">/ Loading…</span></span>
+    </div>
+
+    <!-- Three-panel layout -->
+    <div id="panels" class="panels" hidden>
+      <!-- Left: document tree -->
+      <nav id="doc-tree" class="doc-tree" aria-label="문서 구조 / Document structure"></nav>
+
+      <!-- Centre: document text view -->
+      <article id="doc-view" class="doc-view" aria-label="문서 내용 / Document content"></article>
+
+      <!-- Right/bottom: structure inspector -->
+      <aside id="inspector" class="inspector" aria-label="구조 검사기 / Structure inspector">
+        <h2 class="inspector-title">구조 검사기 <span lang="en">/ Inspector</span></h2>
+        <div id="inspector-content" class="inspector-content"></div>
+      </aside>
+    </div>
+  </main>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
