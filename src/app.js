@@ -92,6 +92,19 @@ function confirmLargeFile() {
  * Validates size, then hands off to the parsing pipeline.
  * @param {File} file
  */
+/**
+ * Show or hide the drop zone. The `hidden` attribute plus an inline display
+ * value — not a stylesheet rule alone — so a cached stylesheet can never leave
+ * the zone covering the document.
+ * @param {boolean} visible
+ */
+function setDropZoneVisible(visible) {
+  dropZone.hidden = !visible;
+  dropZone.style.display = visible ? '' : 'none';
+  const opener = document.getElementById('btn-open-another');
+  if (opener) opener.hidden = visible;
+}
+
 async function handleFile(file) {
   clearError();
 
@@ -100,7 +113,7 @@ async function handleFile(file) {
     if (!proceed) return;
   }
 
-  dropZone.hidden = true;
+  setDropZoneVisible(false);
   spinner.hidden = false;
   panels.hidden = true;
 
@@ -142,10 +155,19 @@ async function handleFile(file) {
     panels.hidden = false;
   } catch (err) {
     showError(err);
-    dropZone.hidden = false;
+    setDropZoneVisible(true);
   } finally {
     spinner.hidden = true;
   }
+}
+
+const btnOpenAnother = document.getElementById('btn-open-another');
+if (btnOpenAnother) {
+  btnOpenAnother.addEventListener('click', () => {
+    setDropZoneVisible(true);
+    const input = document.getElementById('file-input');
+    if (input) { input.value = ''; input.click(); }
+  });
 }
 
 // ── Drag-and-drop events ──────────────────────────────────────────────────────
