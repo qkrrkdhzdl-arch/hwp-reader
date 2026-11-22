@@ -28,6 +28,9 @@ export class HwpError extends Error {
     super(`${messageKo} / ${messageEn}`);
     this.code = code;
     this.name = 'HwpError';
+    // Kept separately so the page can show one language instead of both.
+    this.messageKo = messageKo;
+    this.messageEn = messageEn;
   }
 }
 

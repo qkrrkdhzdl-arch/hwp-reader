@@ -13,6 +13,7 @@
  */
 
 import { readStream } from './cfb.js';
+import { t, getLang, errorMessage } from './i18n.js';
 import { decodeRecords, TAG_NAMES } from './records.js';
 
 // ── TASK-24: Document tree ───────────────────────────────────────────────────
@@ -30,7 +31,7 @@ export function renderTree(doc, container) {
   for (const section of doc.sections) {
     const sectionLi = document.createElement('li');
     sectionLi.className = 'tree-section';
-    sectionLi.textContent = `섹션 ${section.index + 1} / Section ${section.index + 1}`;
+    sectionLi.textContent = t('section', { n: section.index + 1 });
     root.appendChild(sectionLi);
 
     const paraList = document.createElement('ul');
@@ -41,21 +42,19 @@ export function renderTree(doc, container) {
 
       if (para.hasTable && para.table) {
         const { rowCount, colCount } = para.table;
-        paraLi.textContent = `표 ${rowCount}×${colCount} / Table ${rowCount}×${colCount}`;
+        paraLi.textContent = t('table', { rows: rowCount, cols: colCount });
       } else {
         const preview = para.text.trim();
         paraLi.textContent = preview.length > 0
           ? preview.slice(0, 40)
-          : '[빈 단락 / empty]';
+          : t('empty_para');
       }
 
       paraLi.setAttribute('data-section', section.index);
       paraLi.setAttribute('data-para', para.index);
       paraLi.setAttribute('tabindex', '0');
       paraLi.setAttribute('role', 'button');
-      paraLi.setAttribute('aria-label',
-        `섹션 ${section.index + 1}, 단락 ${para.index + 1}로 이동 / Go to section ${section.index + 1}, paragraph ${para.index + 1}`
-      );
+      paraLi.setAttribute('aria-label', t('go_to', { s: section.index + 1, p: para.index + 1 }));
 
       const onClick = () => scrollToElement(section.index, para.index);
       paraLi.addEventListener('click', onClick);
@@ -185,7 +184,7 @@ function _renderParaWithControls(pEl, para) {
         const v = new DataView(ctrl.payload.buffer, ctrl.payload.byteOffset, ctrl.payload.byteLength);
         binId = `BIN#${v.getUint16(0, true)}`;
       }
-      span.textContent = binId || '[이미지 / Image]';
+      span.textContent = binId || t('image');
       pEl.appendChild(span);
     }
   }
@@ -232,7 +231,7 @@ export function renderInspector(cfb, doc, container) {
 function _buildCfbOverview(cfb) {
   const details = document.createElement('details');
   const summary = document.createElement('summary');
-  summary.textContent = 'CFB 개요 / CFB Overview';
+  summary.textContent = t('cfb_overview');
   details.appendChild(summary);
 
   const table = document.createElement('table');
@@ -250,14 +249,14 @@ function _buildCfbOverview(cfb) {
   const root = cfb.directories && cfb.directories[0];
 
   const rows = [
-    ['섹터 크기 / Sector size', `${cfb.sectorSize} bytes`],
-    ['미니 섹터 크기 / Mini-sector size', `${cfb.miniSectorSize} bytes`],
-    ['미니 스트림 임계값 / Mini-stream cutoff', `${cfb.miniStreamCutoff} bytes`],
-    ['총 섹터 수 / Total sectors', totalSectors],
-    ['FAT 섹터 ID / FAT sector IDs', fatSectorIds.length > 0 ? fatSectorIds.join(', ') : '(없음 / none)'],
-    ['디렉토리 시작 섹터 / Directory start sector',
+    [t('row_sector_size'), `${cfb.sectorSize} bytes`],
+    [t('row_mini_sector'), `${cfb.miniSectorSize} bytes`],
+    [t('row_mini_cutoff'), `${cfb.miniStreamCutoff} bytes`],
+    [t('row_total_sectors'), totalSectors],
+    [t('row_fat_ids'), fatSectorIds.length > 0 ? fatSectorIds.join(', ') : t('none')],
+    [t('row_dir_start'),
       root ? `0x${(root.startSector >>> 0).toString(16).padStart(8, '0')}` : '—'],
-    ['총 디렉토리 항목 / Total directory entries', cfb.directories ? cfb.directories.length : 0],
+    [t('row_dir_entries'), cfb.directories ? cfb.directories.length : 0],
   ];
 
   for (const [label, value] of rows) {
@@ -285,7 +284,7 @@ function _buildCfbOverview(cfb) {
 function _buildStreamList(cfb) {
   const details = document.createElement('details');
   const summary = document.createElement('summary');
-  summary.textContent = '스트림 목록 / Stream List';
+  summary.textContent = t('stream_list');
   details.appendChild(summary);
 
   const table = document.createElement('table');
@@ -294,7 +293,7 @@ function _buildStreamList(cfb) {
   // Header row
   const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
-  for (const label of ['이름 / Name', '크기 / Size', '시작 섹터 / Start sector', '경로 / Path', '미니 / Mini']) {
+  for (const label of [t('th_name'), t('th_size'), t('th_start_sector'), t('th_path'), t('th_mini')]) {
     const th = document.createElement('th');
     th.textContent = label;
     headerRow.appendChild(th);
@@ -385,12 +384,12 @@ function _buildRecordPanel() {
   const details = document.createElement('details');
   details.id = 'record-inspector-panel';
   const summary = document.createElement('summary');
-  summary.textContent = '레코드 검사기 / Record Inspector';
+  summary.textContent = t('record_inspector');
   details.appendChild(summary);
 
   const placeholder = document.createElement('p');
   placeholder.style.cssText = 'padding:0.5rem 0.75rem;font-size:0.8rem;color:var(--color-text-muted)';
-  placeholder.textContent = '스트림 목록에서 스트림을 클릭하세요 / Click a stream in the list above';
+  placeholder.textContent = t('record_placeholder');
   details.appendChild(placeholder);
 
   return details;
@@ -419,7 +418,7 @@ function _populateRecordPanel(cfb, panel, streamName, storagePath) {
   } catch (err) {
     const msg = document.createElement('p');
     msg.style.cssText = 'padding:0.5rem 0.75rem;font-size:0.8rem;color:var(--color-error-text)';
-    msg.textContent = `스트림 읽기 실패 / Failed to read stream: ${err.message}`;
+    msg.textContent = `${t('stream_read_failed')}: ${errorMessage(err)}`;
     panel.appendChild(msg);
     return;
   }
@@ -439,7 +438,7 @@ function _populateRecordPanel(cfb, panel, streamName, storagePath) {
 
   const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
-  for (const label of ['태그 ID / Tag ID', '이름 / Name', '레벨 / Level', '크기 / Size', '처음 16바이트 / First 16 bytes']) {
+  for (const label of [t('th_tag_id'), t('th_name'), t('th_level'), t('th_size'), t('th_first_bytes')]) {
     const th = document.createElement('th');
     th.textContent = label;
     headerRow.appendChild(th);
@@ -459,7 +458,7 @@ function _populateRecordPanel(cfb, panel, streamName, storagePath) {
         const td = document.createElement('td');
         td.colSpan = 5;
         td.style.cssText = 'color:var(--color-text-muted);font-style:italic';
-        td.textContent = `… (최대 ${MAX_RECORDS}개 표시 / showing first ${MAX_RECORDS} records)`;
+        td.textContent = t('record_limit', { n: MAX_RECORDS });
         tr.appendChild(td);
         tbody.appendChild(tr);
         break;
@@ -486,7 +485,7 @@ function _populateRecordPanel(cfb, panel, streamName, storagePath) {
     const td = document.createElement('td');
     td.colSpan = 5;
     td.style.cssText = 'color:var(--color-error-text)';
-    td.textContent = `레코드 오류 / Record error: ${err.message}`;
+    td.textContent = `${t('record_error')}: ${errorMessage(err)}`;
     tr.appendChild(td);
     tbody.appendChild(tr);
   }
@@ -496,7 +495,7 @@ function _populateRecordPanel(cfb, panel, streamName, storagePath) {
     const td = document.createElement('td');
     td.colSpan = 5;
     td.style.cssText = 'color:var(--color-text-muted);font-style:italic';
-    td.textContent = '레코드 없음 / No records';
+    td.textContent = t('no_records');
     tr.appendChild(td);
     tbody.appendChild(tr);
   }
@@ -587,11 +586,11 @@ export function exportHtml(doc, filename) {
   const bodyHtml = clone.innerHTML;
 
   const html = `<!DOCTYPE html>
-<html lang="ko">
+<html lang="${getLang()}">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>HWP 내보내기 / HWP Export</title>
+<title>${t('export_title')}</title>
 <style>
   body { font-family: 'Apple SD Gothic Neo', 'Nanum Gothic', 'Malgun Gothic', system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; color: #1a1a2e; line-height: 1.8; }
   .hwp-section { margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #d1d9e6; }

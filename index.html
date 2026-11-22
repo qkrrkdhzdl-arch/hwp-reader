@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HWP 뷰어</title>
-  <link rel="stylesheet" href="styles/app.css?v=3" />
+  <link rel="stylesheet" href="styles/app.css?v=4" />
 </head>
 <body>
   <!-- Error banner — shown when parsing fails -->
@@ -12,36 +12,39 @@
     <span id="error-code" class="error-code"></span>
     <span id="error-message" class="error-message"></span>
     <details id="error-stack-details" hidden>
-      <summary>오류 세부 정보 / Error details</summary>
+      <summary data-i18n="error_details">오류 세부 정보</summary>
       <pre id="error-stack"></pre>
     </details>
-    <button id="error-close" aria-label="오류 닫기 / Close error">✕</button>
+    <button id="error-close" aria-label="오류 닫기" data-i18n-aria="error_close">✕</button>
   </div>
 
   <!-- Large-file confirmation dialog -->
   <dialog id="large-file-dialog" aria-labelledby="large-file-title">
-    <h2 id="large-file-title">큰 파일 / Large file</h2>
-    <p>
-      이 파일은 50 MB보다 큽니다. 처리하는 동안 브라우저가 느려질 수 있습니다.<br />
-      <span lang="en">This file is larger than 50 MB. The browser may slow down while processing it.</span>
+    <h2 id="large-file-title" data-i18n="large_title">큰 파일</h2>
+    <p data-i18n="large_body">
+      이 파일은 50 MB보다 큽니다. 처리하는 동안 브라우저가 느려질 수 있습니다.
     </p>
     <div class="dialog-actions">
-      <button id="large-file-proceed">계속 / Proceed</button>
-      <button id="large-file-cancel">취소 / Cancel</button>
+      <button id="large-file-proceed" data-i18n="large_proceed">계속</button>
+      <button id="large-file-cancel" data-i18n="large_cancel">취소</button>
     </div>
   </dialog>
 
   <header class="app-header">
-    <h1 class="app-title">HWP 뷰어 <span lang="en">/ HWP Viewer</span></h1>
+    <h1 class="app-title" data-i18n="app_title">HWP 뷰어</h1>
     <div class="toolbar" id="toolbar">
-      <button id="btn-open-another" hidden aria-label="다른 파일 열기 / Open another file">
-        다른 파일 <span lang="en">/ Open another</span>
+      <div class="langswitch" role="group" aria-label="Language / 언어">
+        <button type="button" data-lang="ko" aria-pressed="true" data-i18n-aria="lang_ko">KR</button>
+        <button type="button" data-lang="en" aria-pressed="false" data-i18n-aria="lang_en">EN</button>
+      </div>
+      <button id="btn-open-another" hidden aria-label="다른 파일 열기" data-i18n-aria="btn_another">
+        <span data-i18n="btn_another">다른 파일</span>
       </button>
-      <button id="btn-export-json" disabled aria-label="JSON 내보내기 / Export JSON">
-        JSON 내보내기 <span lang="en">/ Export JSON</span>
+      <button id="btn-export-json" disabled aria-label="JSON 내보내기" data-i18n-aria="btn_json">
+        <span data-i18n="btn_json">JSON 내보내기</span>
       </button>
-      <button id="btn-export-html" disabled aria-label="HTML 내보내기 / Export HTML">
-        HTML 내보내기 <span lang="en">/ Export HTML</span>
+      <button id="btn-export-html" disabled aria-label="HTML 내보내기" data-i18n-aria="btn_html">
+        <span data-i18n="btn_html">HTML 내보내기</span>
       </button>
     </div>
   </header>
@@ -53,44 +56,46 @@
       class="drop-zone"
       role="button"
       tabindex="0"
-      aria-label="HWP 파일을 여기에 끌어다 놓거나 클릭하여 선택하세요 / Drop an HWP file here or click to select"
+      aria-label="HWP 파일을 여기에 끌어다 놓거나 클릭하여 선택하세요"
+      data-i18n-aria="drop_aria"
     >
       <div class="drop-zone-icon" aria-hidden="true">📄</div>
-      <p class="drop-zone-primary">HWP 파일을 여기에 끌어다 놓으세요</p>
-      <p class="drop-zone-secondary" lang="en">Drop an .hwp file here, or click to select</p>
+      <p class="drop-zone-primary" data-i18n="drop_primary">HWP 파일을 여기에 끌어다 놓으세요</p>
+      <p class="drop-zone-secondary" data-i18n="drop_secondary">또는 클릭해서 파일을 고르세요</p>
       <label class="drop-zone-label" for="file-input">
-        파일 선택 / Choose file
+        <span data-i18n="drop_label">파일 선택</span>
         <input
           id="file-input"
           type="file"
           accept=".hwp,.hwpx"
-          aria-label="HWP 파일 선택 / Select HWP file"
+          aria-label="HWP 파일 선택"
+          data-i18n-aria="file_aria"
         />
       </label>
     </div>
 
     <!-- Loading spinner — shown during parsing -->
-    <div id="spinner" class="spinner" hidden aria-live="polite" aria-label="불러오는 중 / Loading…">
+    <div id="spinner" class="spinner" hidden aria-live="polite" aria-label="불러오는 중" data-i18n-aria="loading_aria">
       <div class="spinner-ring" aria-hidden="true"></div>
-      <span>불러오는 중… <span lang="en">/ Loading…</span></span>
+      <span data-i18n="loading">불러오는 중…</span>
     </div>
 
     <!-- Three-panel layout -->
     <div id="panels" class="panels" hidden>
       <!-- Left: document tree -->
-      <nav id="doc-tree" class="doc-tree" aria-label="문서 구조 / Document structure"></nav>
+      <nav id="doc-tree" class="doc-tree" aria-label="문서 구조" data-i18n-aria="nav_tree"></nav>
 
       <!-- Centre: document text view -->
-      <article id="doc-view" class="doc-view" aria-label="문서 내용 / Document content"></article>
+      <article id="doc-view" class="doc-view" aria-label="문서 내용" data-i18n-aria="nav_view"></article>
 
       <!-- Right/bottom: structure inspector -->
-      <aside id="inspector" class="inspector" aria-label="구조 검사기 / Structure inspector">
-        <h2 class="inspector-title">구조 검사기 <span lang="en">/ Inspector</span></h2>
+      <aside id="inspector" class="inspector" aria-label="구조 검사기" data-i18n-aria="nav_inspector">
+        <h2 class="inspector-title" data-i18n="inspector_title">구조 검사기</h2>
         <div id="inspector-content" class="inspector-content"></div>
       </aside>
     </div>
   </main>
 
-  <script type="module" src="src/app.js?v=3"></script>
+  <script type="module" src="src/app.js?v=4"></script>
 </body>
 </html>

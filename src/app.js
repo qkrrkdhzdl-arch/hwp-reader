@@ -5,6 +5,8 @@
  * until Phase 10–11 tasks are implemented.
  */
 
+import { bindSwitch, errorMessage as errorText, t } from './i18n.js';
+
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 
 // ── DOM references ────────────────────────────────────────────────────────────
@@ -31,13 +33,12 @@ function showError(err) {
   if (err && err.code) {
     // HwpError with ERR_* code
     errorCode.textContent = `[${err.code}] `;
-    errorMessage.textContent = err.message;
+    errorMessage.textContent = errorText(err);
     errorDetails.hidden = true;
   } else {
     // Unexpected non-HwpError
     errorCode.textContent = '';
-    errorMessage.textContent =
-      '예상치 못한 오류가 발생했습니다 / An unexpected error occurred.';
+    errorMessage.textContent = t('unexpected_error');
     errorDetails.hidden = false;
     errorStack.textContent = err ? (err.stack || String(err)) : 'Unknown error';
   }
@@ -105,6 +106,9 @@ function setDropZoneVisible(visible) {
   if (opener) opener.hidden = visible;
 }
 
+// Kept so a language switch can redraw the panels without opening the file again.
+let lastRender = null;
+
 async function handleFile(file) {
   clearError();
 
@@ -143,6 +147,7 @@ async function handleFile(file) {
     renderTree(doc, treeEl);
     renderDocView(doc, viewEl);
     renderInspector(cfb, doc, inspectorEl);
+    lastRender = { cfb, doc };
 
     // Wire export buttons
     btnExportJson.disabled = false;
@@ -160,6 +165,24 @@ async function handleFile(file) {
     spinner.hidden = true;
   }
 }
+
+// Redraw the three panels in the other language, keeping the document as it is.
+document.addEventListener('hwp:lang', () => {
+  if (!lastRender) return;
+  const treeEl      = document.getElementById('doc-tree');
+  const viewEl      = document.getElementById('doc-view');
+  const inspectorEl = document.getElementById('inspector-content');
+  treeEl.innerHTML = '';
+  viewEl.innerHTML = '';
+  inspectorEl.innerHTML = '';
+  import('./render.js').then(({ renderTree, renderDocView, renderInspector }) => {
+    renderTree(lastRender.doc, treeEl);
+    renderDocView(lastRender.doc, viewEl);
+    renderInspector(lastRender.cfb, lastRender.doc, inspectorEl);
+  });
+});
+
+bindSwitch();
 
 const btnOpenAnother = document.getElementById('btn-open-another');
 if (btnOpenAnother) {
